@@ -14,7 +14,7 @@
 	
 	loadcplugin("a:\tools\ffmpegsource\ffms2.dll")
 	
-# These commands load the various things necessary to get InterFrame to work, including InterFrame itself.  Point them to wherever the corresponding files that came with InterFrame are located.  After doing that, if the script returns an error about being unable to load fftw3.dll, copy that file from interframe\dependencies to your windows\system32 and windows\syswow64 directories.  I realize this is stupid.  I couldn't get it to work any other way.  Programmers are dumbasses.  :D
+# These commands load the various things necessary to get InterFrame to work, including InterFrame itself.  Point them to wherever the corresponding files that came with InterFrame are located.  After doing that, if the script returns an error about being unable to load fftw3.dll, copy that file from interframe\dependencies to your windows\system32 and windows\syswow64 directories.  I realize this is stupid.  I couldn't get it to work any other way.  Sometimes, programmers (like me) are dumbasses.  :D
 	
 	import("a:\tools\avisynth\interframe\interframe.avsi")
 	loadplugin("a:\tools\avisynth\interframe\dependencies\eedi2.dll")
