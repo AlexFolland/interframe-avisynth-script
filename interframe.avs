@@ -6,7 +6,7 @@
 
 # You should change this path to point to wherever your ffms2.dll is.  This is ffmpegsource, something that uses ffmpeg or libav to read video files and turn them into clips avisynth can understand.  You can find it here: http://code.google.com/p/ffmpegsource/ .  If this line returns an error or the output looks weird, try changing "loadcplugin" to just "loadplugin".  There are different ways to load ffmpegsource and I still don't fully understand the difference.  Mine works properly only with "loadcplugin".
 	
-	loadcplugin("a:\tools\avisynth\ffms2\ffms2.dll")
+	loadcplugin("a:\tools\ffmpegsource\ffms2.dll")
 	
 # These commands load the various things necessary to get InterFrame to work, including InterFrame itself.  Point them to wherever the corresponding files that came with InterFrame are located.  After doing that, if the script returns an error about being unable to load fftw3.dll, copy that file from interframe\dependencies to your windows\system32 and windows\syswow64 directories.  I realize this is stupid.  I couldn't get it to work any other way.  Programmers are dumbasses.  :D
 	
@@ -38,10 +38,17 @@
 		algorithm = 0
 		sadmlmaskstrength = 0
 
-# InterFrame settings end here.  Everything after this point just uses all the settings to make it work!
+# InterFrame settings end here.
+
+# If your input video has a variable frame rate, you'll have to set the frame rate yourself if you want the audio to be synchronized with the resulting video.  It would be ideal to not have to do this and pass vfr video straight to InterFrame, but I don't know how.  My vfr video I originally wrote this script for has an intro that's lower frame rate, then has 29.97 fps for the main part.  Therefore, I used 60000/2002.  If your input video has a constant frame rate, just set "variableframerate" to false.
+
+	variableframerate = true
+	inputfpsnumerator = 60000
+	inputfpsdenominator = 2002
+	
+# All settings end here.  The rest of the script just uses all the settings to make it work!
 
 audiostream = ffaudiosource(videofile)
-videostream = ffvideosource(videofile)
+videostream = ffvideosource(videofile,fpsnum=variableframerate?inputfpsnumerator:-1,fpsden=variableframerate?inputfpsdenominator:1)
 dubbedvideo = audiodub(videostream,audiostream)
-
 interframe(dubbedvideo,preset,tuning,outputfpsnumerator,outputfpsdenominator,dependenciespath,usegpu,inputtype,algorithm,sadmlmaskstrength)
