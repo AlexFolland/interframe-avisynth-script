@@ -1,8 +1,8 @@
-# This script was written by me, Alex Folland, in order to use InterFrame (frame rate interpolation script) with any video easily.  I hereby waive all rights to this work by using the Creative Commons Zero license, as described here: http://creativecommons.org/choose/zero/ .  You are free to do whatever you want with it.  It's just data.
+# This script was written by me, Alex Folland, in order to use InterFrame (frame rate interpolation script downloadable from here: http://www.spirton.com/interframe/ ) with any video easily.  I hereby waive all rights to this work by using the Creative Commons Zero license, as described here: http://creativecommons.org/choose/zero/ .  You are free to do whatever you want with it.  It's just data.
 
 # This is the video file you want to load with this script.  A full path can be used.  If no path is used, the video must be in the same directory as this script.  A relative path can be used too.
 	
-	videofile = "c:\media\video\playback temp\Azumanga_Daioh_01[V2].DVD(H264.AAC)[KAA][99DF4C17].mkv"
+	videofile = "C:\media\video\playback temp\Azumanga_Daioh_01[V2].DVD(H264.AAC)[KAA][99DF4C17].mkv"
 	
 # If your input video has a variable frame rate, you'll have to set the frame rate yourself if you want the audio to be synchronized with the resulting video.  It would be ideal to not have to do this and pass vfr video straight to InterFrame, but I don't know how.  My vfr video I originally wrote this script for has an intro that's lower frame rate, then has 29.97 fps for the main part.  Therefore, I used 60000/2002.  If your input video has a constant frame rate, just set "variableframerate" to false.
 
@@ -29,7 +29,7 @@
 
 	# Possible tuning values: Film, Animation, Smooth, UltraSmooth, Weak
 		
-		tuning = "Animation"
+		tuning = "Film"
 
 	# If you want the output fps to match your display, you likely want 60000 as the output fps numerator and 1001 as the output fps denominator, since most displays nowadays are 59.94 Hz, even if they say they're 60 Hz.
 		
@@ -45,10 +45,19 @@
 		sadmlmaskstrength = 0
 
 # InterFrame settings end here.
+
+# Playback speed multiplier!  1 is normal speed, 0.5 is half speed, 0.75 is 3/4 speed, etc.  This will be done before the interframe call, so the slow motion should be shown quite smoothly, assuming interframe is good.  It works nicely for simple motions.
+
+	playbackspeedmultiplier = 1
 	
 # All settings end here.  The rest of the script just uses all the settings to make it work!
 
 audiostream = ffaudiosource(videofile)
 videostream = ffvideosource(videofile,fpsnum=variableframerate?inputfpsnumerator:-1,fpsden=variableframerate?inputfpsdenominator:1)
 dubbedvideo = audiodub(videostream,audiostream)
+
+playbackspeedmultiplier != 1 ? eval("""
+	dubbedvideo = assumefps(dubbedvideo,framerate(dubbedvideo)*playbackspeedmultiplier,sync_audio=true)
+""") : last
+
 interframe(dubbedvideo,preset,tuning,outputfpsnumerator,outputfpsdenominator,dependenciespath,usegpu,inputtype,algorithm,sadmlmaskstrength)
