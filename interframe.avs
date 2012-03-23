@@ -2,11 +2,11 @@
 
 # This is the video file you want to load with this script.  A full path can be used.  If no path is used, the video must be in the same directory as this script.  A relative path can be used too.
 	
-	videofile = "C:\media\video\playback temp\Azumanga_Daioh_01[V2].DVD(H264.AAC)[KAA][99DF4C17].mkv"
+	videofile = "c:\media\video\capture\waencode\wa-tas-mission-01-1turn-6.86sec-lex.mkv"
 	
-# If your input video has a variable frame rate, you'll have to set the frame rate yourself if you want the audio to be synchronized with the resulting video.  It would be ideal to not have to do this and pass vfr video straight to InterFrame, but I don't know how.  My vfr video I originally wrote this script for has an intro that's lower frame rate, then has 29.97 fps for the main part.  Therefore, I used 60000/2002.  If your input video has a constant frame rate, just set "variableframerate" to false.
+# If your input video has a variable frame rate, you'll have to set the frame rate yourself if you want the audio to be synchronized with the resulting video.  It would be ideal to not have to do this and pass vfr video straight to InterFrame, but I don't know how.  My vfr video I originally wrote this script for has an intro that's lower frame rate, then has 29.97 fps for the main part.  Therefore, I used 60000/2002.  If your input video has a constant frame rate, just set "variableframerate" to false, which will cause "inputfpsnumerator" and "inputfpsdenominator" to be ignored.
 
-	variableframerate = true
+	variableframerate = false
 	inputfpsnumerator = 60000
 	inputfpsdenominator = 2002
 
@@ -25,18 +25,18 @@
 
 	# Possible preset values from slowest to fastest: Placebo, Medium, Fast, Faster, Very Fast, Super Fast, Ultra Fast
 		
-		preset = "Ultra Fast"
+		preset = "Fast"
 
 	# Possible tuning values: Film, Animation, Smooth, UltraSmooth, Weak
 		
-		tuning = "Film"
+		tuning = "Animation"
 
 	# If you want the output fps to match your display, you likely want 60000 as the output fps numerator and 1001 as the output fps denominator, since most displays nowadays are 59.94 Hz, even if they say they're 60 Hz.
 		
 		outputfpsnumerator = 60000
 		outputfpsdenominator = 1001
 
-	# This is other dumb stuff that I don't fully understand.  usegpu might be useful to toggle, but I'm not sure how much it helps performance.  The InterFrame documentation said it adds blur that isn't very noticeable.
+	# This is other dumb stuff that I don't fully understand.  usegpu might be useful to toggle, but I'm not sure how much it helps performance.  The InterFrame documentation said it adds blur that isn't very noticeable.  The dependencies path doesn't seem to matter, causing me to still have to load all the dependencies manually anyway, as done above.  Why doesn't it work?  Well, don't ask me.
 
 		dependenciespath = "a:\tools\avisynth\interframe\dependencies\"
 		usegpu = true
@@ -50,6 +50,10 @@
 
 	playbackspeedmultiplier = 1
 	
+# You can toggle InterFrame usage here. (true / false)
+
+	useinterframe = true
+
 # All settings end here.  The rest of the script just uses all the settings to make it work!
 
 audiostream = ffaudiosource(videofile)
@@ -58,6 +62,10 @@ dubbedvideo = audiodub(videostream,audiostream)
 
 playbackspeedmultiplier != 1 ? eval("""
 	dubbedvideo = assumefps(dubbedvideo,framerate(dubbedvideo)*playbackspeedmultiplier,sync_audio=true)
-""") : last
+""") : dubbedvideo
 
-interframe(dubbedvideo,preset,tuning,outputfpsnumerator,outputfpsdenominator,dependenciespath,usegpu,inputtype,algorithm,sadmlmaskstrength)
+useinterframe ? eval("""
+	setmemorymax(512)
+	setmtmode(2)
+	interframe(dubbedvideo,preset,tuning,outputfpsnumerator,outputfpsdenominator,dependenciespath,usegpu,inputtype,algorithm,sadmlmaskstrength)
+""") : dubbedvideo
